@@ -39,46 +39,48 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
                 margin-bottom: 5px;
             }}
             .section {{
-                margin-bottom: 15px;
+                margin-bottom: 20px;
             }}
             .section-title {{
                 font-size: 18px;
                 font-weight: bold;
                 color: #4CAF50;
-                margin-bottom: 5px;
-                padding-bottom: 2px;
-                display: inline-block;
+                margin-bottom: 2px;
+            }}
+            hr {{
+                border: 0;
+                border-top: 1px solid #ccc;
+                margin: 5px 0 10px 0;
             }}
             .section-content {{
                 margin-left: 20px;
-                padding-left: 10px;
-                margin-top: 3px;
                 font-size: 14px;
             }}
             .item {{
                 margin-bottom: 6px;
             }}
-            .degree, .role, .certification {{
+            .degree, .role {{
                 font-weight: bold;
             }}
             .institution, .company {{
                 font-style: italic;
             }}
-            .list-item {{
-                list-style-type: none;
-            }}
             .skills-list {{
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                grid-gap: 10px;
-                padding-left: 0;
-                margin-top: 0;
+                padding: 0;
+                margin: 0;
             }}
             .skills-list li {{
+                display: inline-block;
+                margin-right: 10px;
                 margin-bottom: 5px;
             }}
             .certifications-list, .interests-list {{
-                padding-left: 20px;
+                margin-left: 20px;
+                padding-left: 0;
+            }}
+            .certifications-list li,
+            .interests-list li {{
+                margin-bottom: 5px;
             }}
         </style>
     </head>
@@ -92,7 +94,7 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
 
     # Education Section
     education = parsed_data.get('education', [])
-    html_content += "<div class='section'><div class='section-title'>Education</div><div class='section-content'>"
+    html_content += "<div class='section'><div class='section-title'>Education</div><hr><div class='section-content'>"
     if isinstance(education, list) and education:
         for item in education:
             html_content += f"""
@@ -108,17 +110,17 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
 
     # Skills Section
     skills = parsed_data.get('skills', [])
-    html_content += "<div class='section'><div class='section-title'>Skills</div><div class='section-content'><ul class='skills-list'>"
+    html_content += "<div class='section'><div class='section-title'>Skills</div><hr><div class='section-content'>"
     if isinstance(skills, list) and skills:
-        for skill in skills:
-            html_content += f"<li class='list-item'>{skill}</li>"
+        skills_str = ', '.join(skills)
+        html_content += f"<p>{skills_str}</p>"
     else:
-        html_content += "<li class='list-item'>Not Available</li>"
-    html_content += "</ul></div></div>"
+        html_content += "<p>Not Available</p>"
+    html_content += "</div></div>"
 
     # Experience Section
     experience = parsed_data.get('experience', [])
-    html_content += "<div class='section'><div class='section-title'>Experience</div><div class='section-content'>"
+    html_content += "<div class='section'><div class='section-title'>Experience</div><hr><div class='section-content'>"
     if isinstance(experience, list) and experience:
         for item in experience:
             html_content += f"""
@@ -133,7 +135,7 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
 
     # Projects Section
     projects = parsed_data.get('projects', [])
-    html_content += "<div class='section'><div class='section-title'>Projects</div><div class='section-content'>"
+    html_content += "<div class='section'><div class='section-title'>Projects</div><hr><div class='section-content'>"
     if isinstance(projects, list) and projects:
         for item in projects:
             html_content += f"""
@@ -148,7 +150,7 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
 
     # Certifications Section
     certifications = parsed_data.get('certifications', [])
-    html_content += "<div class='section'><div class='section-title'>Certifications</div><div class='section-content'><ul class='certifications-list'>"
+    html_content += "<div class='section'><div class='section-title'>Certifications</div><hr><div class='section-content'><ul class='certifications-list'>"
     if isinstance(certifications, list) and certifications:
         for certification in certifications:
             html_content += f"<li class='list-item'>{certification}</li>"
@@ -158,7 +160,7 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
 
     # Interests Section
     interests = parsed_data.get('interests', [])
-    html_content += "<div class='section'><div class='section-title'>Interests/Hobbies</div><div class='section-content'><ul class='interests-list'>"
+    html_content += "<div class='section'><div class='section-title'>Interests/Hobbies</div><hr><div class='section-content'><ul class='interests-list'>"
     if isinstance(interests, list) and interests:
         for interest in interests:
             html_content += f"<li class='list-item'>{interest}</li>"
@@ -166,13 +168,11 @@ def generate_resume_from_parsed_data(parsed_data: dict) -> bytes:
         html_content += "<li class='list-item'>Not Available</li>"
     html_content += "</ul></div></div>"
 
-    # Final HTML close
     html_content += """
     </body>
     </html>
     """
 
-    # Convert HTML to PDF
     pdf_output = BytesIO()
     pisa_status = pisa.CreatePDF(html_content, dest=pdf_output)
 
