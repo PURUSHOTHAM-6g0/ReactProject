@@ -2,8 +2,12 @@ import os
 import httpx
 import json
 import logging
+from io import BytesIO
 from dotenv import load_dotenv
 from httpx import TimeoutException  
+from fpdf import FPDF
+from io import BytesIO
+
 
 # Load environment variables
 load_dotenv()
@@ -27,10 +31,9 @@ async def parse_resume_with_openai(resume_text: str) -> dict:
         # Define system prompt
         system_prompt = (
             "You are an intelligent resume parser. Extract structured data from resume text. "
-            "Return only a JSON object with the following keys: name, email, phone, education,skills (list), experience , "
-            "projects, Certifications,Intrests/Hobbies. "
-            "Do not include any explanation or commentary."
-            "If any of the keys are missing  also then make the value of it as Not Available"
+            "Return only a JSON object with the following keys: name, email, phone, education, skills (list), experience, "
+            "projects, certifications, interests/hobbies. "
+            "If any of the keys are missing, make the value 'Not Available'."
         )
 
         # Define the request payload
@@ -77,3 +80,9 @@ async def parse_resume_with_openai(resume_text: str) -> dict:
     except Exception as e:
         logging.error(f"Error while parsing resume: {e}")
         raise
+
+
+
+
+
+
